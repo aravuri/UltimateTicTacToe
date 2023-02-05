@@ -23,7 +23,6 @@ struct TicTacToeGrid {
         }
         return ret;
     }
-
     
 };
 

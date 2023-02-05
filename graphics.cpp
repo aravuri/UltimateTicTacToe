@@ -12,7 +12,7 @@
 #define BIG_TIC_SIZE 180
 #define SMALL_TIC_SIZE 50
 #define SYMBOL_SIZE 35
-#define FONT_SIZE 12
+#define FONT_SIZE 100
 
 const int PADDING_BIG = (SCREEN_SIZE - 3*BIG_TIC_SIZE)/2;
 const int PADDING_SMALL = (BIG_TIC_SIZE - 3*SMALL_TIC_SIZE)/2;
@@ -21,6 +21,8 @@ const int PADDING_SYMBOL = (SMALL_TIC_SIZE - SYMBOL_SIZE)/2;
 SDL_Window* window;
 SDL_Renderer* rend;
 TTF_Font* font;
+SDL_Texture* xTurnText;
+SDL_Texture* oTurnText;
 TicTacToeGame game;
 
 SDL_Window* initWindow() {
@@ -102,6 +104,8 @@ void drawFullGrid() {
     SDL_RenderFillRect(rend, nullptr);
 
     // Write whose turn it is
+    SDL_Rect location{PADDING_BIG, 0, 100, PADDING_BIG + PADDING_SMALL};
+    SDL_RenderCopy(rend, game.xTurn ? xTurnText : oTurnText, nullptr, &location);
     
     //Draw the big tic tac toe lines
     SDL_SetRenderDrawColor(rend, 0x00, 0x00, 0x00, 0x00);
@@ -199,7 +203,13 @@ int main() {
         std::cout << "Font wasn't able to be initialized" << std::endl;
         return 0;
     }
+    //Create the texts
+    SDL_Color black{0, 0, 0};
+    SDL_Surface* xTurnTextSurface = TTF_RenderText_Solid(font, "X's Turn", black);
+    xTurnText = SDL_CreateTextureFromSurface(rend, xTurnTextSurface);
 
+    SDL_Surface* oTurnTextSurface = TTF_RenderText_Solid(font, "O's Turn", black);
+    oTurnText = SDL_CreateTextureFromSurface(rend, oTurnTextSurface);
 
     SDL_Event e; 
     bool quit = false; 
@@ -211,6 +221,10 @@ int main() {
             if (e.type == SDL_MOUSEBUTTONDOWN) {
                 int* tindices = getTileFromMouseClick(e.button.x, e.button.y);
                 game.makeMove(tindices);
+                if (game.bigWinner()) {
+                    quit = true;
+                    break;
+                }
             }
         }
 

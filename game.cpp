@@ -55,6 +55,20 @@ struct TicTacToeGame {
         }
         return ret;
     }
+
+    //Gets the big winner: 00 if no winner, 01 if X won, 10 if O won, and 11 if both won somehow.
+    uint8_t bigWinner() {
+        uint8_t ret = 0;
+        for (auto position : WinPositions) {
+            if ((xWinners & position) == position) {
+                ret |= 1;
+            }
+            if ((oWinners & position) == position) {
+                ret |= 2;
+            }
+        }
+        return ret;
+    }
 };
 
 #endif
